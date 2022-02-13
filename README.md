@@ -24,7 +24,7 @@ E001,Alice Smith,ISO-002,800.00
 go test ./...
 ```
 # Key design decisions
-1. I used golang because it provides types, easy environment setup, and the convenience of async flow
+1. I used golang because it provides type checking, easy environment setup, and the convenience of async flow.
 2. the input file size could potentially be big, so the data is read line by line
 3. the input data source might change from `csv` file to from database in the future. 
 This can be done by having as long as the new `data repository`

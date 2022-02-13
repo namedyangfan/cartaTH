@@ -12,12 +12,7 @@ type CmdCalcualteVestingSchedule struct {
 	Places int32
 }
 
-func (c *CmdCalcualteVestingSchedule) Run(dataRepoClient data_repo.Client, vestCalculatorClient vest_calcualtor.Client) {
-	dataChan := make(chan types.VestingEvent)
-
-	go dataRepoClient.GetVestingEvents(dataChan)
-	vestingResults := vestCalculatorClient.CalculateTotalVestedShares(dataChan)
-
+func (c *CmdCalcualteVestingSchedule) PrintSortedVestingResults(vestingResults types.VestedResults) {
 	keys := vestingResults.GetSortedKeysByEmployeeIdAwardId()
 
 	for _, key := range keys {
@@ -25,4 +20,17 @@ func (c *CmdCalcualteVestingSchedule) Run(dataRepoClient data_repo.Client, vestC
 		line := fmt.Sprintf("%s,%s,%s,%v", key.EmployeeId, key.EmployeeName, key.AwardId, result.StringFixed(c.Places))
 		fmt.Println(line)
 	}
+}
+
+func (c *CmdCalcualteVestingSchedule) Run(dataRepoClient data_repo.Client, vestCalculatorClient vest_calcualtor.Client) {
+	dataChan := make(chan types.VestingEvent)
+
+	// set up data channel to get vesting event
+	go dataRepoClient.GetVestingEvents(dataChan)
+
+	// process the vesting event to get vesting result
+	vestingResults := vestCalculatorClient.CalculateTotalVestedShares(dataChan)
+
+	// print out vesting result
+	c.PrintSortedVestingResults(vestingResults)
 }
